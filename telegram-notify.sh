@@ -1,14 +1,19 @@
 #!/bin/sh
 
-BOT_TOKEN="YOUR_BOT_TOKEN_HERE"
-CHAT_ID="YOUR_CHAT_ID_HERE"
+BOT_TOKEN="telegram_bot_api"
+CHAT_ID="-telegram_chat_id"
 
 TITLE="$1"
 MESSAGE="$2"
-HOSTNAME=$"(hostname -u)"
+DATA_ATUAL=$(date '+%d/%m/%Y')
+HORA_ATUAL=$(date '+%H:%M:%S')
 
 # Simple message without complex formatting
-FULL_MESSAGE="pfSense Alert: $TITLE - $MESSAGE - Time: $(date)"
+FULL_MESSAGE="Alerta - Link pfSense XXXXX
+$TITLE
+$MESSAGE
+Data: $DATA_ATUAL
+Hora: $HORA_ATUAL"
 
 curl -s -X POST \
   "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
