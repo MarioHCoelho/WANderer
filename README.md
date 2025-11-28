@@ -91,10 +91,32 @@ O script que deve ser executado é o `gateway-monitor.sh`. A maneira mais recome
 
 5.  Salve a tarefa. O monitoramento já está ativo!
 
-## Contribuição
+## Verificação de Monitoramento
 
-Sinta-se à vontade para abrir uma *issue* para relatar problemas ou sugerir melhorias. *Pull requests* são muito bem-vindos!
 
-## Licença
+Este método é fundamental para **observar a execução do script em tempo real**, vendo as mensagens de log à medida que são gravadas. É a melhor forma de confirmar que o script está executando na frequência esperada e registrando as transições de estado (UP/DOWN) corretamente.
 
-Este projeto é distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+### Como Funciona:
+
+1.  Você **executa** seu script de monitoramento, seja manualmente ou via `cron`.
+2.  Em um _Command Prompt_ no pfSense, você utiliza o comando `tail` com a opção `-f` (follow/seguir) para exibir continuamente as novas linhas adicionadas ao arquivo de log.
+
+### Exemplo de Uso (no terminal):
+
+```bash
+# 1. Inicie o script (se ele não estiver rodando)
+# Exemplo: nohup ./gateway-monitor.sh & 
+
+# 2. Em seguida, use o comando para monitorar o log
+tail -f /tmp/gateway-monitor.log
+```
+
+**Resultado Esperado:** Você verá o log rolando a cada ciclo de execução do script. Por exemplo:
+
+```
+Thu Nov 27 23:19:00 -03 2025: Checked - WAN1:UP, WAN2:UP
+Thu Nov 27 23:20:00 -03 2025: Checked - WAN1:UP, WAN2:UP
+Thu Nov 27 23:21:00 -03 2025: Checked - WAN1:UP, WAN2:UP
+```
+
+
