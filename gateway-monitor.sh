@@ -1,14 +1,34 @@
 #!/bin/sh
 
-# Gateway configurations
+# --- INFORMAÇÕES DO GATEWAY ---
+# Nomes dos Gateways (Exatamente como em System -> Routing -> Gateways)
 WAN1_NAME="WAN1_DHCP"
-WAN1_IP="192.168.15.1"
-WAN2_NAME="WAN2_DHCP"
-WAN2_IP="192.168.88.1"
+WAN1_OPERATOR="nome_provedora1"
+# Nome da Interface Física/Lógica (Ex: pppoe0, em0, igb1)
+WAN1_IF_NAME="nome_interface1" # <--- PREENCHA AQUI (Ex: pppoe0)
 
-# Check current status with timeout protection
-WAN1_STATUS=$(timeout 10 /root/scripts/check-gateway-status.sh "$WAN1_IP" || echo "DOWN")
-WAN2_STATUS=$(timeout 10 /root/scripts/check-gateway-status.sh "$WAN2_IP" || echo "DOWN")
+# Nomes dos Gateways
+WAN2_NAME="WAN2_DHCP"
+WAN2_OPERATOR="nome_provedora2"
+# Nome da Interface Física/Lógica
+WAN2_IF_NAME="nome_interface2"    # <--- PREENCHA AQUI (Ex: igb1 ou em1)
+
+# --- LÓGICA DE VERIFICAÇÃO NATIVA DO PFSENSE (VERSÃO CORRIGIDA) ---
+GW_STATUS_OUTPUT=$(/usr/local/sbin/pfSsh.php playback gatewaystatus)
+
+# Verifica o status (usando grep duplo para mais confiabilidade)
+if echo "$GW_STATUS_OUTPUT" | grep "$WAN1_NAME" | grep -q "online"; then
+    WAN1_STATUS="UP"
+else
+    WAN1_STATUS="DOWN"
+fi
+
+if echo "$GW_STATUS_OUTPUT" | grep "$WAN2_NAME" | grep -q "online"; then
+    WAN2_STATUS="UP"
+else
+    WAN2_STATUS="DOWN"
+fi
+# --- O RESTO DO SEU SCRIPT (LOGS E ALERTAS) CONTINUA IGUAL ---
 
 # Read previous status
 if [ -f /tmp/gateway-status.log ]; then
@@ -21,18 +41,26 @@ fi
 
 # Send alerts if status changed
 if [ "$WAN1_STATUS" != "$OLD_WAN1" ]; then
+    # Pega o IP atual da interface SÓ para a notificação
+    CURRENT_IP=$(ifconfig $WAN1_IF_NAME | grep 'inet ' | awk '{print $2}')
+    
     if [ "$WAN1_STATUS" = "UP" ]; then
-        /root/scripts/telegram-notify.sh "Gateway UP" "WAN1_DHCP is now ONLINE - IP: 192.168.15.1"
+        /root/scripts/telegram-notify.sh "✅ WAN1 Subiu" "O link $WAN1_NAME ($WAN1_OPERATOR) está ONLINE. 
+IP: $CURRENT_IP"
     else
-        /root/scripts/telegram-notify.sh "Gateway DOWN" "WAN1_DHCP is OFFLINE - IP: 192.168.15.1"
+        /root/scripts/telegram-notify.sh "🚨 WAN1 Caiu" "O link $WAN1_NAME ($WAN1_OPERATOR) está OFFLINE."
     fi
 fi
 
 if [ "$WAN2_STATUS" != "$OLD_WAN2" ]; then
+    # Pega o IP atual da interface SÓ para a notificação
+    CURRENT_IP=$(ifconfig $WAN2_IF_NAME | grep 'inet ' | awk '{print $2}')
+
     if [ "$WAN2_STATUS" = "UP" ]; then
-        /root/scripts/telegram-notify.sh "Gateway UP" "WAN2_DHCP is now ONLINE - IP: 192.168.88.1"
+        /root/scripts/telegram-notify.sh "✅ WAN2 Subiu" "O link $WAN2_NAME ($WAN2_OPERATOR) está ONLINE. 
+IP: $CURRENT_IP"
     else
-        /root/scripts/telegram-notify.sh "Gateway DOWN" "WAN2_DHCP is OFFLINE - IP: 192.168.88.1"
+        /root/scripts/telegram-notify.sh "🚨 WAN2 Caiu" "O link $WAN2_NAME ($WAN2_OPERATOR) está OFFLINE."
     fi
 fi
 
