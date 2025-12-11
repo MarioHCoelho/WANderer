@@ -45,10 +45,10 @@ if [ "$WAN1_STATUS" != "$OLD_WAN1" ]; then
     CURRENT_IP=$(ifconfig $WAN1_IF_NAME | grep 'inet ' | awk '{print $2}')
     
     if [ "$WAN1_STATUS" = "UP" ]; then
-        /root/scripts/telegram-notify.sh "✅ WAN1 Subiu" "O link $WAN1_NAME ($WAN1_OPERATOR) está ONLINE. 
+        /root/scripts/telegram-notify.sh "WAN1 Subiu" "O link $WAN1_NAME ($WAN1_OPERATOR) está ONLINE. 
 IP: $CURRENT_IP"
     else
-        /root/scripts/telegram-notify.sh "🚨 WAN1 Caiu" "O link $WAN1_NAME ($WAN1_OPERATOR) está OFFLINE."
+        /root/scripts/telegram-notify.sh "WAN1 Caiu" "O link $WAN1_NAME ($WAN1_OPERATOR) está OFFLINE."
     fi
 fi
 
@@ -57,10 +57,10 @@ if [ "$WAN2_STATUS" != "$OLD_WAN2" ]; then
     CURRENT_IP=$(ifconfig $WAN2_IF_NAME | grep 'inet ' | awk '{print $2}')
 
     if [ "$WAN2_STATUS" = "UP" ]; then
-        /root/scripts/telegram-notify.sh "✅ WAN2 Subiu" "O link $WAN2_NAME ($WAN2_OPERATOR) está ONLINE. 
+        /root/scripts/telegram-notify.sh "WAN2 Subiu" "O link $WAN2_NAME ($WAN2_OPERATOR) está ONLINE. 
 IP: $CURRENT_IP"
     else
-        /root/scripts/telegram-notify.sh "🚨 WAN2 Caiu" "O link $WAN2_NAME ($WAN2_OPERATOR) está OFFLINE."
+        /root/scripts/telegram-notify.sh "WAN2 Caiu" "O link $WAN2_NAME ($WAN2_OPERATOR) está OFFLINE."
     fi
 fi
 
